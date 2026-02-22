@@ -1,0 +1,2 @@
+class WebsiteData < ApplicationRecord
+end

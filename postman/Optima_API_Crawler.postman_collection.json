@@ -1,0 +1,59 @@
+{
+  "info": {
+    "name": "EmasGo_API_Crawler",
+    "description": "API endpoints for the Website Crawler service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Website Data",
+      "item": [
+        {
+          "name": "Crawl Website",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://brooklynsewersolutions.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/website_data",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "website_data"
+              ]
+            },
+            "description": "Intelligently crawls a plumbing/sewer website and extracts 7 required business data points (business name, license, trenchless technology, emergency service, equipment brands, services list, prices)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

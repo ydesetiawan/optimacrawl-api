@@ -1,0 +1,33 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/api/v1/website_data":
+    post:
+      summary: Crawl Website Data
+      tags:
+      - Website Data Crawler
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: unprocessable entity (missing url)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  example: https://brooklynsewersolutions.com
+              required:
+              - url
+servers:
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com
