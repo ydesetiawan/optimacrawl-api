@@ -31,8 +31,7 @@ RSpec.describe 'api/v1/website_data', type: :request do
             emergency_service: true,
             specific_equipment: [ 'Ridgid', 'Picote' ],
             services_list: [ 'Drain Cleaning', 'Camera Inspection' ],
-            trenchless_technologies: [ 'CIPP (Cured-In-Place Pipe)', 'Pipe Bursting' ],
-            price_mentions: [ '$99 Drain Cleaning' ]
+            trenchless_technologies: [ 'CIPP (Cured-In-Place Pipe)', 'Pipe Bursting' ]
           )
 
           # Allow the record to appear persisted for the controller

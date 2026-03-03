@@ -16,8 +16,7 @@ class WebsiteCrawlerService
       emergency_service: false,
       specific_equipment: [],
       services_list: [],
-      trenchless_technologies: [],
-      price_mentions: []
+      trenchless_technologies: []
     }
   end
 
@@ -292,10 +291,6 @@ class WebsiteCrawlerService
       end
     end
     @extracted_data[:trenchless_technologies].uniq!
-
-    # 8. Price Mentions
-    prices = text.scan(/\$[\d,]+(?:\.\d{2})?\s+(?:for|off|drain|cleaning|service|coupon|discount)?/i).map(&:strip)
-    @extracted_data[:price_mentions] = prices.uniq
   end
 
   def save_website_data

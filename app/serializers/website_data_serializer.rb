@@ -5,5 +5,5 @@ class WebsiteDataSerializer
 
   attributes :url, :business_name, :license_status, :has_trenchless,
              :emergency_service, :specific_equipment, :services_list,
-             :trenchless_technologies, :price_mentions, :created_at, :updated_at
+             :trenchless_technologies, :created_at, :updated_at
 end
