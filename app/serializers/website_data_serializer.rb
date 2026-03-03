@@ -4,6 +4,7 @@ class WebsiteDataSerializer
   include JSONAPI::Serializer
 
   attributes :url, :business_name, :license_status, :has_trenchless,
-             :emergency_service, :specific_equipment, :services_list,
-             :trenchless_technologies, :created_at, :updated_at
+             :has_emergency_service, :equipment_brands_list, :services_list,
+             :trenchless_technologies_list, :emergency_services_list,
+             :created_at, :updated_at
 end

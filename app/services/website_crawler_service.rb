@@ -13,10 +13,11 @@ class WebsiteCrawlerService
       business_name: nil,
       license_status: "Not found",
       has_trenchless: false,
-      emergency_service: false,
-      specific_equipment: [],
+      has_emergency_service: false,
+      equipment_brands_list: nil,
       services_list: [],
-      trenchless_technologies: []
+      trenchless_technologies_list: [],
+      emergency_services_list: []
     }
   end
 
@@ -192,15 +193,112 @@ class WebsiteCrawlerService
     # 3. Has Trenchless (boolean)
     @extracted_data[:has_trenchless] = lower_text.match?(/trenchless|cipp|lining|pipe bursting/)
 
-    # 4. Emergency Service
-    @extracted_data[:emergency_service] = lower_text.match?(/24\/7|emergency|24 hours|around the clock/)
+    # 4. Emergency Service (boolean)
+    @extracted_data[:has_emergency_service] = lower_text.match?(/24\/7|emergency|24 hours|around the clock/)
 
-    # 5. Specific Equipment
-    brands = %w[ridgid picote nuflow spartan hammerhead perma-liner]
-    brands.each do |brand|
-      @extracted_data[:specific_equipment] << brand.capitalize if lower_text.include?(brand)
+    # 4b. Emergency Services List
+    # Each entry: [search_term, label] — multiple search terms can map to the same label
+    emergency_mappings = [
+      [ "24/7", "24/7 Available" ],
+      [ "24 hours", "24/7 Available" ],
+      [ "24-hour", "24/7 Available" ],
+      [ "around the clock", "24/7 Available" ],
+      [ "24 hour service", "24/7 Available" ],
+      [ "emergency service", "Emergency Available" ],
+      [ "emergency plumb", "Emergency Available" ],
+      [ "emergency repair", "Emergency Available" ],
+      [ "emergency call", "Emergency Available" ],
+      [ "emergency response", "Emergency Available" ],
+      [ "same-day", "Rapid/Same-Day Response" ],
+      [ "same day", "Rapid/Same-Day Response" ],
+      [ "rapid response", "Rapid/Same-Day Response" ],
+      [ "fast response", "Rapid/Same-Day Response" ],
+      [ "quick response", "Rapid/Same-Day Response" ],
+      [ "after-hours", "After-Hours Available" ],
+      [ "after hours", "After-Hours Available" ],
+      [ "nights and weekends", "After-Hours Available" ],
+      [ "weekend service", "After-Hours Available" ],
+      [ "evening service", "After-Hours Available" ]
+    ]
+
+    emergency_mappings.each do |term, label|
+      if lower_text.include?(term)
+        @extracted_data[:emergency_services_list] << label
+      end
     end
-    @extracted_data[:specific_equipment].uniq!
+    @extracted_data[:emergency_services_list].uniq!
+
+    # Default to "No Emergency Service" if nothing found
+    if @extracted_data[:emergency_services_list].empty?
+      @extracted_data[:emergency_services_list] << "No Emergency Service"
+    end
+
+    # 5. Equipment Brands List (categorized)
+    # Each entry: [search_term, brand_label, category]
+    equipment_mappings = [
+      # Excavation Equipment
+      [ "caterpillar", "Caterpillar (CAT)", "Excavation Equipment" ],
+      [ "cat excavat", "Caterpillar (CAT)", "Excavation Equipment" ],
+      [ "case construct", "Case", "Excavation Equipment" ],
+      [ "case excavat", "Case", "Excavation Equipment" ],
+      [ "komatsu", "Komatsu", "Excavation Equipment" ],
+      [ "john deere", "John Deere", "Excavation Equipment" ],
+      [ "volvo construct", "Volvo", "Excavation Equipment" ],
+      [ "volvo excavat", "Volvo", "Excavation Equipment" ],
+      [ "kubota", "Kubota", "Excavation Equipment" ],
+      # Vacuum / Hydro-Jetting Trucks
+      [ "vactor", "Vactor", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "aquatech", "Aqua", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "aqua jet", "Aqua", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "aqua pro", "Aqua", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "vortex", "Vortex", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "super products", "Super Products", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "freightliner", "Freightliner", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "spartan tool", "Spartan Tool", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "spartan jet", "Spartan Tool", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "general wire", "General Wire", "Vacuum / Hydro-Jetting Trucks" ],
+      [ "harben", "Harben", "Vacuum / Hydro-Jetting Trucks" ],
+      # CCTV / Pipe Inspection
+      [ "ridgid", "RIDGID", "CCTV / Pipe Inspection" ],
+      [ "envirosight", "Envirosight", "CCTV / Pipe Inspection" ],
+      [ "aries industries", "Aries Industries", "CCTV / Pipe Inspection" ],
+      [ "ipek", "iPEK", "CCTV / Pipe Inspection" ],
+      [ "pearpoint", "Pearpoint", "CCTV / Pipe Inspection" ],
+      [ "cobra camera", "Cobra", "CCTV / Pipe Inspection" ],
+      [ "cobra inspect", "Cobra", "CCTV / Pipe Inspection" ],
+      # Trenchless / Pipe Lining & Bursting
+      [ "hammerhead", "Hammerhead", "Trenchless / Pipe Lining & Bursting" ],
+      [ "tt technologies", "TT Technologies", "Trenchless / Pipe Lining & Bursting" ],
+      [ "nuflow", "NuFlow", "Trenchless / Pipe Lining & Bursting" ],
+      [ "nu flow", "NuFlow", "Trenchless / Pipe Lining & Bursting" ],
+      [ "perma-pipe", "Perma-Pipe", "Trenchless / Pipe Lining & Bursting" ],
+      [ "perma pipe", "Perma-Pipe", "Trenchless / Pipe Lining & Bursting" ],
+      [ "perma-liner", "Perma-Liner", "Trenchless / Pipe Lining & Bursting" ],
+      [ "perma liner", "Perma-Liner", "Trenchless / Pipe Lining & Bursting" ],
+      [ "tracto-technik", "TRACTO-TECHNIK", "Trenchless / Pipe Lining & Bursting" ],
+      [ "tracto technik", "TRACTO-TECHNIK", "Trenchless / Pipe Lining & Bursting" ],
+      [ "picote", "Picote", "Trenchless / Pipe Lining & Bursting" ],
+      # Drain Cleaning Machines
+      [ "electric eel", "Electric Eel", "Drain Cleaning Machines" ],
+      [ "spartan drain", "Spartan Tool", "Drain Cleaning Machines" ],
+      [ "general wire spring", "General Wire", "Drain Cleaning Machines" ],
+      [ "ridgid drain", "RIDGID", "Drain Cleaning Machines" ],
+      [ "ridgid k-", "RIDGID", "Drain Cleaning Machines" ]
+    ]
+
+    brands_by_category = Hash.new { |h, k| h[k] = [] }
+
+    equipment_mappings.each do |term, brand, category|
+      if lower_text.include?(term)
+        brands_by_category[category] << brand
+      end
+    end
+
+    # Deduplicate each category
+    brands_by_category.each_value(&:uniq!)
+
+    # Only keep categories that have brands; set to nil if nothing found
+    @extracted_data[:equipment_brands_list] = brands_by_category.any? ? brands_by_category : nil
 
     # 6. Services List
     # Each entry: [search_term, label] — multiple search terms can map to the same label
@@ -287,10 +385,10 @@ class WebsiteCrawlerService
 
     trenchless_mappings.each do |term, label|
       if lower_text.include?(term)
-        @extracted_data[:trenchless_technologies] << label
+        @extracted_data[:trenchless_technologies_list] << label
       end
     end
-    @extracted_data[:trenchless_technologies].uniq!
+    @extracted_data[:trenchless_technologies_list].uniq!
   end
 
   def save_website_data

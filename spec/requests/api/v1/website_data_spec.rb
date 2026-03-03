@@ -28,10 +28,14 @@ RSpec.describe 'api/v1/website_data', type: :request do
             business_name: 'Brooklyn Sewer Solutions',
             license_status: '12345',
             has_trenchless: true,
-            emergency_service: true,
-            specific_equipment: [ 'Ridgid', 'Picote' ],
+            has_emergency_service: true,
+            equipment_brands_list: {
+              'CCTV / Pipe Inspection' => [ 'RIDGID' ],
+              'Trenchless / Pipe Lining & Bursting' => [ 'Picote' ]
+            },
             services_list: [ 'Drain Cleaning', 'Camera Inspection' ],
-            trenchless_technologies: [ 'CIPP (Cured-In-Place Pipe)', 'Pipe Bursting' ]
+            trenchless_technologies_list: [ 'CIPP (Cured-In-Place Pipe)', 'Pipe Bursting' ],
+            emergency_services_list: [ '24/7 Available', 'Emergency Available' ]
           )
 
           # Allow the record to appear persisted for the controller
@@ -47,7 +51,7 @@ RSpec.describe 'api/v1/website_data', type: :request do
           expect(data['data']['attributes']['url']).to eq('https://brooklynsewersolutions.com')
           expect(data['data']['attributes']['business_name']).to eq('Brooklyn Sewer Solutions')
           expect(data['data']['attributes']['has_trenchless']).to be true
-          expect(data['data']['attributes']['trenchless_technologies']).to include('CIPP (Cured-In-Place Pipe)')
+          expect(data['data']['attributes']['trenchless_technologies_list']).to include('CIPP (Cured-In-Place Pipe)')
         end
       end
 
