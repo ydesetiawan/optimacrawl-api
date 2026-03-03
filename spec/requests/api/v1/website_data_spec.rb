@@ -27,10 +27,11 @@ RSpec.describe 'api/v1/website_data', type: :request do
             url: 'https://brooklynsewersolutions.com',
             business_name: 'Brooklyn Sewer Solutions',
             license_status: '12345',
-            trenchless_technology: true,
+            has_trenchless: true,
             emergency_service: true,
             specific_equipment: [ 'Ridgid', 'Picote' ],
             services_list: [ 'Drain Cleaning', 'Camera Inspection' ],
+            trenchless_technologies: [ 'CIPP (Cured-In-Place Pipe)', 'Pipe Bursting' ],
             price_mentions: [ '$99 Drain Cleaning' ]
           )
 
@@ -46,6 +47,8 @@ RSpec.describe 'api/v1/website_data', type: :request do
           expect(data['data']).to be_present
           expect(data['data']['attributes']['url']).to eq('https://brooklynsewersolutions.com')
           expect(data['data']['attributes']['business_name']).to eq('Brooklyn Sewer Solutions')
+          expect(data['data']['attributes']['has_trenchless']).to be true
+          expect(data['data']['attributes']['trenchless_technologies']).to include('CIPP (Cured-In-Place Pipe)')
         end
       end
 

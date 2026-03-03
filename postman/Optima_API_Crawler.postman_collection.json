@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "EmasGo_API_Crawler",
+    "name": "Optima_API_Crawler",
     "description": "API endpoints for the Website Crawler service",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -49,7 +49,7 @@
                 "website_data"
               ]
             },
-            "description": "Intelligently crawls a plumbing/sewer website and extracts 7 required business data points (business name, license, trenchless technology, emergency service, equipment brands, services list, prices)."
+            "description": "Intelligently crawls a plumbing/sewer website and extracts 9 required business data points (business name, license, has_trenchless, trenchless_technologies, emergency service, equipment brands, services list, prices)."
           },
           "response": []
         }

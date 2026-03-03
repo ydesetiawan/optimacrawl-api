@@ -12,10 +12,11 @@ class WebsiteCrawlerService
       url: @base_url,
       business_name: nil,
       license_status: "Not found",
-      trenchless_technology: false,
+      has_trenchless: false,
       emergency_service: false,
       specific_equipment: [],
       services_list: [],
+      trenchless_technologies: [],
       price_mentions: []
     }
   end
@@ -25,7 +26,14 @@ class WebsiteCrawlerService
 
     urls_to_crawl = fetch_target_urls
 
-    # Fallback to base url if no sitemap or specific plumbing pages found
+    # Fallback: discover internal links from homepage if sitemap yielded nothing useful
+    if urls_to_crawl.empty? || urls_to_crawl == [ @base_url ]
+      urls_to_crawl = discover_links_from_homepage
+      urls_to_crawl.unshift(@base_url)
+      urls_to_crawl.uniq!
+    end
+
+    # Final fallback to base url only
     urls_to_crawl = [ @base_url ] if urls_to_crawl.empty?
 
     Rails.logger.info("Crawling urls: #{urls_to_crawl}")
@@ -91,7 +99,7 @@ class WebsiteCrawlerService
       end
 
       # Filter for plumbing/sewer keywords, or return home/about/services pages
-      target_keywords = %w[plumbing sewer drain pipe trenchless services about contact]
+      target_keywords = %w[plumbing sewer drain pipe trenchless lining services about contact]
 
       filtered = all_urls.select do |url|
         !url.match?(/\.(jpg|jpeg|png|gif|pdf)$/i) && target_keywords.any? { |kw| url.downcase.include?(kw) }
@@ -103,6 +111,40 @@ class WebsiteCrawlerService
     rescue StandardError
       []
     end
+  end
+
+  def discover_links_from_homepage
+    html = URI.open(@base_url, "User-Agent" => USER_AGENT, read_timeout: 10).read
+    doc = Nokogiri::HTML(html)
+
+    base_host = URI.parse(@base_url).host
+    target_keywords = %w[plumbing sewer drain pipe trenchless lining services about contact]
+
+    links = doc.css("a[href]").filter_map do |a|
+      href = a["href"].to_s.strip
+      next if href.empty? || href.start_with?("#", "mailto:", "tel:", "javascript:")
+
+      # Build absolute URL from relative paths
+      absolute = if href.start_with?("http")
+                   href
+      else
+                   URI.join(@base_url + "/", href).to_s
+      end
+
+      # Only keep same-domain links
+      next unless URI.parse(absolute).host == base_host
+      # Skip binary/media files
+      next if absolute.match?(/\.(jpg|jpeg|png|gif|pdf|css|js|ico|svg|woff|mp4)$/i)
+      # Filter for relevant keywords in the URL path
+      next unless target_keywords.any? { |kw| absolute.downcase.include?(kw) }
+
+      absolute.chomp("/")
+    end
+
+    links.uniq
+  rescue StandardError => e
+    Rails.logger.error("Link discovery failed for #{@base_url}: #{e.message}")
+    []
   end
 
   def crawl_pages(urls)
@@ -148,8 +190,8 @@ class WebsiteCrawlerService
     license_match = text.match(/(?:license|lic|master plumber)\s*(?:#|no\.?|number)?\s*(:|-)?\s*([A-Z0-9-]+)/i)
     @extracted_data[:license_status] = license_match[2].strip if license_match
 
-    # 3. Trenchless Technology
-    @extracted_data[:trenchless_technology] = lower_text.match?(/trenchless|cipp|lining|pipe bursting/)
+    # 3. Has Trenchless (boolean)
+    @extracted_data[:has_trenchless] = lower_text.match?(/trenchless|cipp|lining|pipe bursting/)
 
     # 4. Emergency Service
     @extracted_data[:emergency_service] = lower_text.match?(/24\/7|emergency|24 hours|around the clock/)
@@ -173,7 +215,43 @@ class WebsiteCrawlerService
     end
     @extracted_data[:services_list].uniq!
 
-    # 7. Price Mentions
+    # 7. Trenchless Technologies List
+    # Each entry: [search_term, label] — multiple search terms can map to the same label
+    trenchless_mappings = [
+      [ "cipp", "CIPP (Cured-In-Place Pipe)" ],
+      [ "cured-in-place pipe", "CIPP (Cured-In-Place Pipe)" ],
+      [ "cured in place", "CIPP (Cured-In-Place Pipe)" ],
+      [ "cured in place pipe", "CIPP (Cured-In-Place Pipe)" ],
+      [ "pipe lining", "Pipe Lining" ],
+      [ "sewer lining", "Pipe Lining" ],
+      [ "pipe relining", "Pipe Lining" ],
+      [ "sewer relining", "Pipe Lining" ],
+      [ "drain lining", "Pipe Lining" ],
+      [ "pipe bursting", "Pipe Bursting" ],
+      [ "pipe burst", "Pipe Bursting" ],
+      [ "slip lining", "Slip Lining" ],
+      [ "sliplining", "Slip Lining" ],
+      [ "spray lining", "Spray Lining / Epoxy Coating" ],
+      [ "epoxy coating", "Spray Lining / Epoxy Coating" ],
+      [ "epoxy lining", "Spray Lining / Epoxy Coating" ],
+      [ "horizontal directional drilling", "Horizontal Directional Drilling (HDD)" ],
+      [ "directional drilling", "Horizontal Directional Drilling (HDD)" ],
+      [ "hdd drilling", "Horizontal Directional Drilling (HDD)" ],
+      [ "microtunneling", "Microtunneling" ],
+      [ "micro tunneling", "Microtunneling" ],
+      [ "auger boring", "Auger Boring" ],
+      [ "pipe reaming", "Pipe Reaming" ],
+      [ "grouting", "Grouting" ]
+    ]
+
+    trenchless_mappings.each do |term, label|
+      if lower_text.include?(term)
+        @extracted_data[:trenchless_technologies] << label
+      end
+    end
+    @extracted_data[:trenchless_technologies].uniq!
+
+    # 8. Price Mentions
     prices = text.scan(/\$[\d,]+(?:\.\d{2})?\s+(?:for|off|drain|cleaning|service|coupon|discount)?/i).map(&:strip)
     @extracted_data[:price_mentions] = prices.uniq
   end
