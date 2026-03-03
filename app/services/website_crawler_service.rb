@@ -218,6 +218,7 @@ class WebsiteCrawlerService
     # 7. Trenchless Technologies List
     # Each entry: [search_term, label] — multiple search terms can map to the same label
     trenchless_mappings = [
+      [ "trenchless", "Trenchless" ],
       [ "cipp", "CIPP (Cured-In-Place Pipe)" ],
       [ "cured-in-place pipe", "CIPP (Cured-In-Place Pipe)" ],
       [ "cured in place", "CIPP (Cured-In-Place Pipe)" ],
