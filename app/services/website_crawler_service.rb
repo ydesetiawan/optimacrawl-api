@@ -188,7 +188,7 @@ class WebsiteCrawlerService
     end
 
     # 2. License Numbers & Has License
-    license_numbers = text.scan(/(?:license|lic|master plumber)\s*(?:#|no\.?|number)?\s*[:|-]?\s*(\d{2,4}-\d{4,10})/i)
+    license_numbers = text.scan(/(?:license|lic|master plumber)\s*(?:no\.?|number)?\s*[:|-]?\s*#?\s*(\d{2,4}-\d{4,10})/i)
                           .flatten
                           .map(&:strip)
                           .uniq
