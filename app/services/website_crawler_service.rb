@@ -204,14 +204,55 @@ class WebsiteCrawlerService
     @extracted_data[:specific_equipment].uniq!
 
     # 6. Services List
-    common_services = [
-      "hydro-jetting", "camera inspection", "excavation",
-      "drain cleaning", "pipe relining", "sewer repair",
-      "water heater repair", "leak detection", "hydro jetting", "video inspection"
+    # Each entry: [search_term, label] — multiple search terms can map to the same label
+    service_mappings = [
+      [ "hydro-jetting", "Hydro-Jetting" ],
+      [ "hydro jetting", "Hydro-Jetting" ],
+      [ "hydrojetting", "Hydro-Jetting" ],
+      [ "water jetting", "Hydro-Jetting" ],
+      [ "high pressure jetting", "Hydro-Jetting" ],
+      [ "camera inspection", "Camera Inspection" ],
+      [ "video inspection", "Camera Inspection" ],
+      [ "sewer camera", "Camera Inspection" ],
+      [ "pipe inspection", "Camera Inspection" ],
+      [ "cctv inspection", "Camera Inspection" ],
+      [ "excavation", "Excavation" ],
+      [ "dig up", "Excavation" ],
+      [ "drain cleaning", "Drain Cleaning" ],
+      [ "drain clearing", "Drain Cleaning" ],
+      [ "clogged drain", "Drain Cleaning" ],
+      [ "drain clog", "Drain Cleaning" ],
+      [ "sewer line cleaning", "Sewer Line Cleaning" ],
+      [ "sewer cleaning", "Sewer Line Cleaning" ],
+      [ "sewer rodding", "Sewer Line Cleaning" ],
+      [ "sewer maintenance", "Sewer Line Cleaning" ],
+      [ "root removal", "Root Removal" ],
+      [ "root intrusion", "Root Removal" ],
+      [ "tree root", "Root Removal" ],
+      [ "root cutting", "Root Removal" ],
+      [ "pipe repair", "Pipe Repair" ],
+      [ "sewer repair", "Pipe Repair" ],
+      [ "drain repair", "Pipe Repair" ],
+      [ "pipe fix", "Pipe Repair" ],
+      [ "pipe replacement", "Pipe Replacement" ],
+      [ "sewer replacement", "Pipe Replacement" ],
+      [ "repipe", "Pipe Replacement" ],
+      [ "re-pipe", "Pipe Replacement" ],
+      [ "backflow testing", "Backflow Testing" ],
+      [ "backflow prevention", "Backflow Testing" ],
+      [ "backflow certification", "Backflow Testing" ],
+      [ "backflow inspection", "Backflow Testing" ],
+      [ "grease trap cleaning", "Grease Trap Cleaning" ],
+      [ "grease trap", "Grease Trap Cleaning" ],
+      [ "grease interceptor", "Grease Trap Cleaning" ],
+      [ "smoke testing", "Smoke Testing" ],
+      [ "smoke test", "Smoke Testing" ]
     ]
 
-    common_services.each do |service|
-      @extracted_data[:services_list] << service.split.map(&:capitalize).join(" ") if lower_text.include?(service)
+    service_mappings.each do |term, label|
+      if lower_text.include?(term)
+        @extracted_data[:services_list] << label
+      end
     end
     @extracted_data[:services_list].uniq!
 
