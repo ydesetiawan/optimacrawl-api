@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_03_212239) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_03_221714) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,8 +20,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_03_212239) do
     t.jsonb "emergency_services_list"
     t.jsonb "equipment_brands_list"
     t.boolean "has_emergency_service"
+    t.boolean "has_license", default: false
     t.boolean "has_trenchless"
-    t.string "license_status"
+    t.jsonb "license_numbers"
     t.jsonb "services_list"
     t.jsonb "trenchless_technologies_list"
     t.datetime "updated_at", null: false

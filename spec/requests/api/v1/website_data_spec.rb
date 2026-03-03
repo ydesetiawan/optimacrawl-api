@@ -26,7 +26,8 @@ RSpec.describe 'api/v1/website_data', type: :request do
           mock_record = WebsiteData.new(
             url: 'https://brooklynsewersolutions.com',
             business_name: 'Brooklyn Sewer Solutions',
-            license_status: '12345',
+            has_license: true,
+            license_numbers: [ '12345' ],
             has_trenchless: true,
             has_emergency_service: true,
             equipment_brands_list: {
@@ -50,6 +51,8 @@ RSpec.describe 'api/v1/website_data', type: :request do
           expect(data['data']).to be_present
           expect(data['data']['attributes']['url']).to eq('https://brooklynsewersolutions.com')
           expect(data['data']['attributes']['business_name']).to eq('Brooklyn Sewer Solutions')
+          expect(data['data']['attributes']['has_license']).to be true
+          expect(data['data']['attributes']['license_numbers']).to include('12345')
           expect(data['data']['attributes']['has_trenchless']).to be true
           expect(data['data']['attributes']['trenchless_technologies_list']).to include('CIPP (Cured-In-Place Pipe)')
         end

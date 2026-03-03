@@ -11,7 +11,8 @@ class WebsiteCrawlerService
     @extracted_data = {
       url: @base_url,
       business_name: nil,
-      license_status: "Not found",
+      has_license: false,
+      license_numbers: nil,
       has_trenchless: false,
       has_emergency_service: false,
       equipment_brands_list: nil,
@@ -186,9 +187,16 @@ class WebsiteCrawlerService
       end
     end
 
-    # 2. License Status
-    license_match = text.match(/(?:license|lic|master plumber)\s*(?:#|no\.?|number)?\s*(:|-)?\s*([A-Z0-9-]+)/i)
-    @extracted_data[:license_status] = license_match[2].strip if license_match
+    # 2. License Numbers & Has License
+    license_numbers = text.scan(/(?:license|lic|master plumber)\s*(?:#|no\.?|number)?\s*[:|-]?\s*(\d{2,4}-\d{4,10})/i)
+                          .flatten
+                          .map(&:strip)
+                          .uniq
+
+    if license_numbers.any?
+      @extracted_data[:has_license] = true
+      @extracted_data[:license_numbers] = license_numbers
+    end
 
     # 3. Has Trenchless (boolean)
     @extracted_data[:has_trenchless] = lower_text.match?(/trenchless|cipp|lining|pipe bursting/)
