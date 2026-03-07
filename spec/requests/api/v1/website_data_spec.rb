@@ -30,11 +30,16 @@ RSpec.describe 'api/v1/website_data', type: :request do
             license_numbers: [ '12345' ],
             has_trenchless: true,
             has_emergency_service: true,
+            has_services: true,
+            about_us: 'We are Brooklyn Sewer Solutions',
             equipment_brands_list: {
               'CCTV / Pipe Inspection' => [ 'RIDGID' ],
               'Trenchless / Pipe Lining & Bursting' => [ 'Picote' ]
             },
-            services_list: [ 'Drain Cleaning', 'Camera Inspection' ],
+            services_list: {
+              'Sewer Inspection' => [ 'Camera Inspection' ],
+              'Sewer Maintenance' => [ 'Drain Cleaning' ]
+            },
             trenchless_technologies_list: [ 'CIPP (Cured-In-Place Pipe)', 'Pipe Bursting' ],
             emergency_services_list: [ '24/7 Available', 'Emergency Available' ]
           )
@@ -54,6 +59,8 @@ RSpec.describe 'api/v1/website_data', type: :request do
           expect(data['data']['attributes']['has_license']).to be true
           expect(data['data']['attributes']['license_numbers']).to include('12345')
           expect(data['data']['attributes']['has_trenchless']).to be true
+          expect(data['data']['attributes']['has_services']).to be true
+          expect(data['data']['attributes']['about_us']).to eq('We are Brooklyn Sewer Solutions')
           expect(data['data']['attributes']['trenchless_technologies_list']).to include('CIPP (Cured-In-Place Pipe)')
         end
       end

@@ -49,7 +49,7 @@
                 "website_data"
               ]
             },
-            "description": "Intelligently crawls a plumbing/sewer website and extracts business data points (business name, has_license, license_numbers, has_trenchless, trenchless_technologies_list, has_emergency_service, emergency_services_list, equipment_brands_list, services list)."
+            "description": "Intelligently crawls a plumbing/sewer website and extracts business data points (business name, has_license, license_numbers, has_trenchless, trenchless_technologies_list, has_emergency_service, emergency_services_list, equipment_brands_list, services_list, has_services, about_us)."
           },
           "response": []
         }

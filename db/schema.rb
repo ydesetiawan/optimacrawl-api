@@ -10,17 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_03_221714) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_07_041553) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "website_data", force: :cascade do |t|
+    t.text "about_us"
     t.string "business_name"
     t.datetime "created_at", null: false
     t.jsonb "emergency_services_list"
     t.jsonb "equipment_brands_list"
     t.boolean "has_emergency_service"
     t.boolean "has_license", default: false
+    t.boolean "has_services"
     t.boolean "has_trenchless"
     t.jsonb "license_numbers"
     t.jsonb "services_list"
